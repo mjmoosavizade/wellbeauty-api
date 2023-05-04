@@ -241,7 +241,7 @@ exports.activateUser = (req, res) => {
     ActivationCode.find({user: req.body.userId})
         .exec()
         .then(result => {
-            if (req.body.avtivationCode == result.authCode) {
+            if (req.body.avtivationCode === result.authCode) {
                 User.findByIdAndUpdate({_id: req.body.userId}, {active: true}, {new: true})
                     .exec()
                     .then(result => {
@@ -274,7 +274,7 @@ exports.updateMyProfile = (req, res) => {
     const updateOps = {};
     console.log(req.file);
     for (const [objKey, value] of Object.entries(req.body)) {
-        if (objKey != "passwordHash" || objKey != "active" || objKey != "phone") {
+        if (objKey !== "passwordHash" || objKey !== "active" || objKey !== "phone") {
             updateOps[objKey] = value;
         }
     }

@@ -48,18 +48,30 @@ exports.getOneTickets = (req, res) => {
 };
 
 exports.createTicket = (req, res) => {
-    const createObj = {};
-    for (const [objKey, value] of Object.entries(req.body)) {
-        createObj[objKey] = value;
-    }
-    const ticket = new Ticket({
-        customer: req.userData.userId,
-    });
-    ticket.save().then(result => {
-        res.status(201).json({success: true, data: result})
+    Ticket.find({lastname: req.userData.userId}).then(result => {
+        if (result >= 1) {
+            return res.status(200).json({
+                success: true,
+                data: result
+            })
+        } else {
+            const createObj = {};
+            for (const [objKey, value] of Object.entries(req.body)) {
+                createObj[objKey] = value;
+            }
+            const ticket = new Ticket({
+                customer: req.userData.userId,
+            });
+            ticket.save().then(result => {
+                res.status(201).json({success: true, data: result})
+            }).catch(err => {
+                res.status(500).json({success: 'false', message: "Error creating a ticket", error: err})
+            })
+        }
     }).catch(err => {
-        res.status(500).json({success: 'false', message: "Error creating a ticket", error: err})
+        return res.status(500).json({success: false, message: "Error getting tickets", error: err});
     })
+
 };
 
 

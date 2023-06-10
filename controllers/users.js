@@ -6,6 +6,8 @@ var Kavenegar = require('kavenegar');
 const sms = Kavenegar.KavenegarApi({apikey: '75676D4E386278447765682F39417544755151306949735552684D397863587974634731777433685347553D'});
 const Ghasedak = require("ghasedak");
 const {Ticket} = require("../models/tickets");
+const AWS = require('aws-sdk');
+const s3 = new AWS.S3();
 
 // let sms = new Ghasedak("7f3529b3e37113c426541a10618a6b6e7483b9fd06345988b927765d4bddb0c3");
 // let sms = new Ghasedak(process.env.API_URL);

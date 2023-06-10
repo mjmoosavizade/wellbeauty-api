@@ -63,6 +63,8 @@ exports.getAllAppointments = (req, res) => {
 };
 
 exports.makeAppoinment = (req, res) => {
+    console.log('check');
+
     const createObj = {};
     for (const [objKey, value] of Object.entries(req.body)) {
         createObj[objKey] = value;
@@ -76,8 +78,7 @@ exports.makeAppoinment = (req, res) => {
     const appointment = new Appointment({
         date: req.body.date,
         time: req.body.time,
-        length: req.body.length,
-        type: req.body.type,
+        procedures: req.body.procedures,
         description: req.body.description,
         customer: customer,
     });

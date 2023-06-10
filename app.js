@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const webpush = require('web-push');
 const schedule = require('node-schedule');
-// const AWS = require('aws-sdk');
+
 
 const productsRouter = require('./routes/products');
 const categoryRouter = require('./routes/categories');
@@ -19,12 +19,10 @@ const testResultsRouter = require('./routes/testResults');
 const orderRouter = require('./routes/orders');
 const broadcastMessages = require('./routes/broadcastMessages');
 const supportMessages = require('./routes/supportMessages');
-const { Message } = require('./models/messages');
+const {Message} = require('./models/messages');
 
 const app = express();
 const server = http.createServer(app)
-
-
 
 
 require('dotenv/config');
@@ -33,11 +31,12 @@ const api = process.env.API_URL;
 
 
 
+
 app.use(cors());
 
 
 //Middleware
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(morgan('tiny'));
 app.use('/uploads', express.static(__dirname + '/uploads'));
@@ -59,7 +58,11 @@ app.use(`${api}/support-messages`, supportMessages);
 app.use(`${api}/orders`, orderRouter);
 
 //Database Connection
-mongoose.connect(process.env.CONNECTION_STRING, { useNewUrlParser: true, useFindAndModify: false, useUnifiedTopology: true })
+mongoose.connect(process.env.CONNECTION_STRING, {
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true
+})
     .then(() => {
         console.log('Database connection is ready...')
     })
@@ -67,7 +70,6 @@ mongoose.connect(process.env.CONNECTION_STRING, { useNewUrlParser: true, useFind
         console.log('Database error', err)
     });
 mongoose.set('useCreateIndex', true);
-
 
 
 app.post(`${api}/subscribe`, (req, res) => {
@@ -81,7 +83,7 @@ app.post(`${api}/subscribe`, (req, res) => {
 
 
     // Create payload
-    const payload = JSON.stringify({ title: "یادآوری", payload: { body: subscription.body } });
+    const payload = JSON.stringify({title: "یادآوری", payload: {body: subscription.body}});
 
     // Pass object into sendNotification
 
@@ -97,16 +99,16 @@ app.post(`${api}/subscribe`, (req, res) => {
 
 
 app.use(`${api}/messages/:id`, (req, res) => {
-    Message.find({ user: req.params.id }).populate("user sender").exec()
+    Message.find({user: req.params.id}).populate("user sender").exec()
         .then(result => {
             if (result.length >= 1) {
                 res.status(200).json({ success: true, data: result });
             } else {
-                res.status(404).json({ success: false, message: "No content" });
+                res.status(404).json({success: false, message: "No content"});
             }
         })
         .catch(err => {
-            res.status(404).json({ success: false, message: "Error getting the messages" });
+            res.status(404).json({success: false, message: "Error getting the messages"});
         });
 });
 
@@ -114,13 +116,13 @@ app.use(`${api}/messages/`, (req, res) => {
     Message.find().populate("user sender").exec()
         .then(result => {
             if (result.length >= 1) {
-                res.status(200).json({ success: true, data: result });
+                res.status(200).json({success: true, data: result});
             } else {
-                res.status(404).json({ success: false, message: "No content" });
+                res.status(404).json({success: false, message: "No content"});
             }
         })
         .catch(err => {
-            res.status(404).json({ success: false, message: "Error getting the messages" });
+            res.status(404).json({success: false, message: "Error getting the messages"});
         });
 });
 

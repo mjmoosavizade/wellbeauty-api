@@ -6,14 +6,7 @@ const checkAdmin = require("../middleware/check-admin");
 const multer = require('multer');
 
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/users');
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + file.originalname);
-    }
-});
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
     // reject a file

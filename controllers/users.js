@@ -8,6 +8,7 @@ const Ghasedak = require("ghasedak");
 const {Ticket} = require("../models/tickets");
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3();
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
 // let sms = new Ghasedak("7f3529b3e37113c426541a10618a6b6e7483b9fd06345988b927765d4bddb0c3");
 // let sms = new Ghasedak(process.env.API_URL);
@@ -145,7 +146,7 @@ exports.login = (req, res) => {
                                                     ticket: null
                                                 });
                                         }
-                                    }).catch(err=>{
+                                    }).catch(err => {
                                         return res
                                             .status(200)
                                             .json({
@@ -182,6 +183,7 @@ exports.updateUser = (req, res) => {
     User.findOneAndUpdate({_id: req.params.id}, {$set: updateOps}, {new: true})
         .exec()
         .then((doc) => {
+            console.log(doc);
             res.status(200).json({success: true, data: doc});
         })
         .catch((err) => {
@@ -263,8 +265,16 @@ exports.activateUser = (req, res) => {
 
 exports.getMyProfile = (req, res) => {
     User.findById(req.userData.userId)
+        .lean()
         .exec()
         .then(result => {
+            const signedUrlExpireSeconds = 60 * 5
+            const data = s3.getSignedUrl('getObject', {
+                Bucket: "cyclic-tame-rose-clownfish-ring-us-west-1",
+                Key: result.image,
+                Expires: signedUrlExpireSeconds
+            });
+            result['image'] = data;
             res.status(200).json({success: true, data: result});
         })
         .catch(err => {
@@ -272,26 +282,40 @@ exports.getMyProfile = (req, res) => {
         })
 };
 
-exports.updateMyProfile = (req, res) => {
+exports.updateMyProfile = async (req, res) => {
     const updateOps = {};
     console.log(req.file);
+    const imageName = Date.now() + '.jpg';
+
     for (const [objKey, value] of Object.entries(req.body)) {
-        if (objKey !== "passwordHash" || objKey !== "active" || objKey !== "phone") {
-            updateOps[objKey] = value;
+        if (objKey !== "passwordHash" && objKey !== "active" && objKey !== "phone") {
+            console.log(objKey)
+            if (objKey === "image") {
+                console.log(imageName)
+                updateOps["image"] = imageName
+                let buf = Buffer.from(req.body.image.replace(/^data:image\/\w+;base64,/, ""), 'base64')
+                await s3.putObject({
+                    Body: buf,
+                    ContentEncoding: 'base64',
+                    Bucket: "cyclic-nice-gold-oyster-slip-af-south-1",
+                    Key: imageName,
+                }).promise()
+            } else {
+                updateOps[objKey] = value;
+            }
         }
     }
     if (req.file) {
-        updateOps["image"] = req.file.path
-        console.log(req.file.path)
+
     }
     User.findByIdAndUpdate({_id: req.userData.userId}, {$set: updateOps}, {new: true})
         .exec()
         .then((doc) => {
             res.status(200).json({success: true, data: doc});
         })
-        .catch((err) => {
-            res.status(500).json({success: false, message: "error updating the profile", error: err});
-        });
+    // .catch((err) => {
+    //     res.status(500).json({success: false, message: "error updating the profile", error: err});
+    // });
 };
 
 exports.updatePassword = (req, res) => {

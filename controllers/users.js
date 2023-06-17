@@ -8,7 +8,7 @@ const Ghasedak = require("ghasedak");
 const {Ticket} = require("../models/tickets");
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3();
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const {getSignedUrl} = require("@aws-sdk/s3-request-presigner");
 
 // let sms = new Ghasedak("7f3529b3e37113c426541a10618a6b6e7483b9fd06345988b927765d4bddb0c3");
 // let sms = new Ghasedak(process.env.API_URL);
@@ -289,24 +289,16 @@ exports.updateMyProfile = async (req, res) => {
 
     for (const [objKey, value] of Object.entries(req.body)) {
         if (objKey !== "passwordHash" && objKey !== "active" && objKey !== "phone") {
-            console.log(objKey)
-            if (objKey === "image") {
-                console.log(imageName)
-                updateOps["image"] = imageName
-                let buf = Buffer.from(req.body.image.replace(/^data:image\/\w+;base64,/, ""), 'base64')
-                await s3.putObject({
-                    Body: buf,
-                    ContentEncoding: 'base64',
-                    Bucket: "cyclic-nice-gold-oyster-slip-af-south-1",
-                    Key: imageName,
-                }).promise()
-            } else {
-                updateOps[objKey] = value;
-            }
+            updateOps[objKey] = value;
         }
     }
     if (req.file) {
-
+        await s3.putObject({
+            Body: req.file.buffer,
+            Bucket: "cyclic-nice-gold-oyster-slip-af-south-1",
+            Key: imageName,
+        }).promise()
+        updateOps["image"] = imageName
     }
     User.findByIdAndUpdate({_id: req.userData.userId}, {$set: updateOps}, {new: true})
         .exec()

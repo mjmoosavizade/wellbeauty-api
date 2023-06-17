@@ -270,7 +270,7 @@ exports.getMyProfile = (req, res) => {
         .then(result => {
             const signedUrlExpireSeconds = 60 * 5
             const data = s3.getSignedUrl('getObject', {
-                Bucket: "cyclic-tame-rose-clownfish-ring-us-west-1",
+                Bucket: "cyclic-nice-gold-oyster-slip-af-south-1",
                 Key: result.image,
                 Expires: signedUrlExpireSeconds
             });

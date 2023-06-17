@@ -1,19 +1,6 @@
 const {Ticket, TicketConvo} = require('../models/tickets');
-const AWS = require("aws-sdk");
-
-const bucketName = process.env.BUCKET_NAME
-const bucketRegion = process.env.BUCEKT_REGION
-const accessKey = process.env.ACCESS_KEY
-const secretAccessKey = process.env.SECRET_ACCESS_KEY
-
-const s3 = new AWS.S3({
-    credentials: {
-        accessKeyId: accessKey,
-        secretAccessKey: secretAccessKey,
-    },
-    region: bucketRegion,
-
-});
+const AWS = require('aws-sdk');
+const s3 = new AWS.S3();
 
 exports.getAllTickets = (req, res) => {
     Ticket.find().populate({path: "TicketConvo", populate: "ticketId"}).then(result => {
@@ -81,12 +68,7 @@ exports.sendMessage = (req, res) => {
         if (result) {
             console.log(result)
             console.log(req.body.author)
-            await s3.putObject({
-                Bucket: bucketName,
-                Key: req.file.originalname,
-                Body: req.file.buffer,
-                ContentType: req.file.mimeType,
-            })
+            const imageName = Date.now() + '.jpg';
             if (result['customer'] === req.body.author) {
                 const ticketConvo = new TicketConvo({
                     ticketId: req.body.ticketId,
@@ -117,9 +99,10 @@ exports.sendMessage = (req, res) => {
         } else {
             res.status(500).json({success: false, message: "Message send failed"})
         }
-    }).catch(err => {
-        res.status(500).json({success: false, message: "Message send failed"})
-    });
+    })
+        .catch(err => {
+            res.status(500).json({success: false, message: "Message send failed"})
+        });
 
 };
 

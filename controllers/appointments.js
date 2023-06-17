@@ -62,6 +62,21 @@ exports.getAllAppointments = (req, res) => {
 
 };
 
+exports.getMyAppointments = (req, res) => {
+    console.log('hc');
+    Appointment.find({customer:req.userData.userId}).populate('customer').then(appointmentList => {
+        console.log(appointmentList)
+        if (appointmentList < 1) {
+            res.status(404).json({ success: false, message: 'No Content' });
+        } else {
+            res.status(200).json({ success: true, data: appointmentList });
+        }
+    }).catch(err => {
+        res.status(500).json({ success: false, message: err })
+    });
+
+};
+
 exports.makeAppoinment = (req, res) => {
     console.log('check');
 

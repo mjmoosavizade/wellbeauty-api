@@ -268,13 +268,15 @@ exports.getMyProfile = (req, res) => {
         .lean()
         .exec()
         .then(result => {
-            const signedUrlExpireSeconds = 60 * 5
-            const data = s3.getSignedUrl('getObject', {
-                Bucket: "cyclic-nice-gold-oyster-slip-af-south-1",
-                Key: result.image,
-                Expires: signedUrlExpireSeconds
-            });
-            result['image'] = data;
+            if (result.image) {
+                const signedUrlExpireSeconds = 60 * 5
+                const data = s3.getSignedUrl('getObject', {
+                    Bucket: "cyclic-nice-gold-oyster-slip-af-south-1",
+                    Key: result.image,
+                    Expires: signedUrlExpireSeconds
+                });
+                result['image'] = data;
+            }
             res.status(200).json({success: true, data: result});
         })
         .catch(err => {

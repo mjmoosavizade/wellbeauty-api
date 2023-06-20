@@ -25,6 +25,7 @@ exports.signup = (req, res) => {
                     const user = new User({
                         passwordHash: hash,
                         phone: req.body.phone,
+                        userType: req.body.userType
                     });
                     user.save().then(doc => {
                         console.log(doc.phone)

@@ -54,16 +54,16 @@ exports.signup = (req, res) => {
                             }
                         );
                     })
-                        .catch(err => {
-                            res.status(500).json({success: false, message: 'Signup failure', error: err});
-                        })
+                        // .catch(err => {
+                        //     res.status(500).json({success: false, message: 'Signup failure', error: err});
+                        // })
                 }
             })
         }
     })
-        .catch(err => {
-            res.status(500).json({success: false, message: "Error while chekcing for user", error: err})
-        });
+        // .catch(err => {
+        //     res.status(500).json({success: false, message: "Error while chekcing for user", error: err})
+        // });
 
 
 };
